@@ -1,0 +1,26 @@
+version: '3.8'
+services:
+  api-gateway:
+    build: ./ApiGateway
+    ports:
+      - "8080:8080"
+    networks:
+      - my-network
+
+  user-service:
+    build: ./UserService
+    ports:
+      - "8081:8081"
+    networks:
+      - my-network
+
+  blog-service:
+    build: ./BlogService
+    ports:
+      - "8082:8082"
+    networks:
+      - my-network
+
+networks:
+  my-network:
+    driver: bridge

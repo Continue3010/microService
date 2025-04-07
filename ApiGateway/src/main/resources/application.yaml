@@ -1,0 +1,39 @@
+#spring:
+#  application:
+#    name: ApiGateway
+#  cloud:
+#    gateway:
+#      routes:
+#        - id: BlogService
+#          uri: http://localhost:8082
+#          predicates:
+#            - Path=/api/v1/blog/**
+#
+#        - id: UserService
+#          uri: http://localhost:8081
+#          predicates:
+#            - Path=/api/v1/user/**
+#  main:
+#    web-application-type: reactive
+#server:
+#  port: 8080
+spring:
+  application:
+    name: ApiGateway
+  cloud:
+    gateway:
+      routes:
+        - id: BlogService
+          uri: http://blog-service:8082  # Sử dụng tên container trong mạng Docker
+          predicates:
+            - Path=/api/v1/blog/**
+
+        - id: UserService
+          uri: http://user-service:8081  # Sử dụng tên container trong mạng Docker
+          predicates:
+            - Path=/api/v1/user/**
+  main:
+    web-application-type: reactive
+server:
+  port: 8080
+
