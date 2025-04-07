@@ -36,15 +36,11 @@ jobs:
       with:
         distribution: 'temurin'
         java-version: '17'
-    - name: Build all services with Maven
+    - name: Install Maven manually
       run: |
-          for dir in ./*; do
-            if [ -f "$dir/pom.xml" ]; then
-              echo "::group::🛠️ Building Maven project in $dir"
-              mvn clean install -f "$dir/pom.xml"
-              echo "::endgroup::"
-            fi
-          done
+        sudo apt-get update
+        sudo apt-get install -y maven
+        mvn --version
     - name: Install Snyk
       run: |
         npm install -g snyk
