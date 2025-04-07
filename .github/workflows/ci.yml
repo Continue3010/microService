@@ -59,13 +59,15 @@ jobs:
         docker-compose -f docker-compose.yml config | grep image | awk '{print $2}' | while read image; do 
           snyk container test $image --severity-threshold=$SNYK_SEVERITY_THRESHOLD || exit 1
         done
-
     - name: SonarCloud Scan
-      uses: SonarSource/sonarcloud-github-action@v5.0.0
+      uses: SonarSource/sonarqube-scan-action@v5.0
+      env:
+        SONAR_TOKEN: ${{ secrets.SONARQUBE_TOKEN }}  # Required - from SonarCloud
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Required for PR decoration
       with:
-        projectKey: ${{ secrets.PROJECT_KEY }} # You can store the project key as a secret
-        organization: ${{ secrets.SONARQUBE_ORG }}      # You can store the organization as a secret
-        token: ${{ secrets.SONARQUBE_TOKEN }}
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        args: >
+          -Dsonar.projectKey=${{ secrets.PROJECT_KEY }}
+          -Dsonar.organization=${{ secrets.SONARQUBE_ORG }}
+          -Dsonar.host.url=https://sonarcloud.io
+          -Dsonar.projectVersion=1.0.$GITHUB_RUN_NUMBER
     
