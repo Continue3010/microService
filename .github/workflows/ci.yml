@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ "main" ]
 
+env:
+    SNYK_SEVERITY_THRESHOLD: high
+
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
@@ -21,7 +24,7 @@ jobs:
       run: |
         sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
         sudo chmod +x /usr/local/bin/docker-compose
-        docker-compose --version  # Kiểm tra Docker Compose đã được cài đặt thành công
+        docker-compose --version
 
     - name: Log in to Docker Hub
       uses: docker/login-action@v2
@@ -29,7 +32,33 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+    - name: Install Snyk
+      run: |
+        npm install -g snyk
+
+    - name: Authenticate Snyk
+      run: |
+        snyk auth ${{ secrets.SNYK_TOKEN }}
+
     - name: Build and push images using Docker Compose
       run: |
         docker-compose -f docker-compose.yml build
-        docker-compose -f docker-compose.yml push
+        docker-compose -f docker-compose.yml push || exit 1
+
+    - name: Test Docker images with Snyk
+      run: |
+        docker-compose -f docker-compose.yml config | grep image | awk '{print $2}' | while read image; do 
+          snyk container test $image --severity-threshold=$SNYK_SEVERITY_THRESHOLD || exit 1
+        done
+
+    - name: Set up SonarQube Scanner
+      uses: sonarsource/sonarcloud-github-action@v1.2
+      with:
+        token: ${{ secrets.SONARQUBE_TOKEN }}
+        organization: Continue3010  # Thay bằng org thực tế
+        projectKey:  ${{ secrets.PROJECT_KEY }}
+    # Thay bằng project key thực tế
+
+    - name: Run SonarQube analysis
+      run: |
+        sonar-scanner -Dsonar.projectVersion=1.0.$GITHUB_RUN_NUMBER || exit 1
