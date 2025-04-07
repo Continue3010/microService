@@ -53,6 +53,9 @@ jobs:
       run: |
         docker-compose -f docker-compose.yml build
         docker-compose -f docker-compose.yml push || exit 1
+    - name: Install SonarScanner
+      run: |
+        sudo apt-get install -y sonar-scanner
     - name: Loop through services and build
       run: |
         # Duyệt qua tất cả thư mục con trong thư mục gốc (hoặc thư mục dịch vụ)
