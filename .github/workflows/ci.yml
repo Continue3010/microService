@@ -31,9 +31,20 @@ jobs:
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
-    - name: Build Java project using Maven
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+    - name: Build all services with Maven
       run: |
-        docker run --rm -v $(pwd):/app -w /app maven:3.8.8-eclipse-temurin-17 mvn clean install
+          for dir in ./*; do
+            if [ -f "$dir/pom.xml" ]; then
+              echo "::group::🛠️ Building Maven project in $dir"
+              mvn clean install -f "$dir/pom.xml"
+              echo "::endgroup::"
+            fi
+          done
     - name: Install Snyk
       run: |
         npm install -g snyk
