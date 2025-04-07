@@ -61,8 +61,11 @@ jobs:
         done
 
     - name: SonarCloud Scan
-      uses: SonarSource/sonarcloud-github-action@master
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SONAR_TOKEN: ${{ secrets.SONARQUBE_TOKEN }}
+      uses: SonarSource/sonarcloud-github-action@v5.0.0
+      with:
+        projectKey: ${{ secrets.PROJECT_KEY }} # You can store the project key as a secret
+        organization: ${{ secrets.SONARQUBE_ORG }}      # You can store the organization as a secret
+        token: ${{ secrets.SONARQUBE_TOKEN }}
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     
