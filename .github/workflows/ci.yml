@@ -60,14 +60,9 @@ jobs:
           snyk container test $image --severity-threshold=$SNYK_SEVERITY_THRESHOLD || exit 1
         done
 
-    - name: SonarQube Analysis with Maven
-      uses: sonarsource/sonarcloud-github-action@v1.2
-      with:
-        entryPoint: mvn
-        args: "clean install sonar:sonar -Dsonar.projectKey=${{ secrets.PROJECT_KEY }} -Dsonar.organization=${{ secrets.SONARQUBE_ORG }} -Dsonar.host.url=https://sonarcloud.io"
-        projectBaseDir: .
-    # Thay bằng project key thực tế
-
-    - name: Run SonarQube analysis
-      run: |
-        sonar-scanner -Dsonar.projectVersion=1.0.$GITHUB_RUN_NUMBER || exit 1
+    - name: SonarCloud Scan
+      uses: SonarSource/sonarcloud-github-action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONARQUBE_TOKEN }}
+    
