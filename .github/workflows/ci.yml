@@ -68,39 +68,27 @@ jobs:
 
     - name: Build, test and scan services
       run: |
-        # Find all directories containing pom.xml
-        for dir in $(find . -name "pom.xml" -exec dirname {} \;); do
-          echo "➡️ Processing service in $dir..."
-          
-          # Build with Maven (including tests)
-          echo "🔨 Building with Maven..."
-          mvn -f "$dir/pom.xml" clean package
-          
-          # Get service name from directory name
-          service_name=$(basename "$dir")
-          image_name="$DOCKER_ORG/$service_name:latest"
-          
-          # Build Docker image
-          echo "🐳 Building Docker image $image_name..."
-          docker build -t "$image_name" "$dir"
-          
-          # Push Docker image
+        # Duyệt qua tất cả thư mục con trong thư mục gốc (hoặc thư mục dịch vụ)
+        for dir in $(find . -type d -name "pom.xml" | sed 's/\/pom.xml//'); do
+          echo "➡️ Building $dir..."
+          mvn -f $dir/pom.xml clean install -DskipTests
+    
+          echo "🐳 Building Docker image..."
+          docker build -t $DOCKER_ORG/$(basename $dir):latest $dir
+    
           echo "🚀 Pushing Docker image..."
-          docker push "$image_name"
-          
-          # Snyk scan
+          docker push $DOCKER_ORG/$(basename $dir):latest
+    
           echo "🔍 Scanning with Snyk..."
-          snyk container test "$image_name" --severity-threshold=$SNYK_SEVERITY_THRESHOLD || exit 1
-          
-          # SonarCloud scan
-          echo "📊 Running SonarCloud scan..."
+          snyk container test $DOCKER_ORG/$(basename $dir):latest --severity-threshold=$SNYK_SEVERITY_THRESHOLD || exit 1
+          echo "📊 SonarCloud scan for $dir"
           sonar-scanner \
-            -Dsonar.projectKey=$SONAR_ORG-$service_name \
+            -Dsonar.projectKey=$SONAR_ORG-$(basename $dir) \
             -Dsonar.organization=$SONAR_ORG \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
-            -Dsonar.projectBaseDir="$dir" \
-            -Dsonar.java.binaries="$dir/target/classes" \
+            -Dsonar.projectBaseDir=$dir \
+            -Dsonar.java.binaries=$dir/target/classes \
             -Dsonar.projectVersion=1.0.${{ github.run_number }}
         done
 
