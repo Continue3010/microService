@@ -8,9 +8,8 @@ on:
 
 env:
     SNYK_SEVERITY_THRESHOLD: high
-    DOCKER_ORG: ${{ secrets.DOCKERHUB_USERNAME }}   # 👈 Lấy từ secrets
-    SONAR_ORG: ${{ secrets.SONARQUBE_ORG }}   # 👈 Lấy từ secrets
-
+    DOCKER_ORG: ${{ secrets.DOCKERHUB_USERNAME }}  
+    SONAR_ORG: ${{ secrets.SONARQUBE_ORG }}   
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
