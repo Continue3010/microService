@@ -60,9 +60,9 @@ jobs:
         docker-compose -f docker-compose.yml push || exit 1
     - name: Install Sonar Scanner
       run: |
-        wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip
-        unzip sonar-scanner-cli-4.6.2.2472-linux.zip
-        sudo mv sonar-scanner-4.6.2.2472-linux /opt/sonar-scanner
+        wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
+        unzip sonar-scanner-cli-5.0.1.3006-linux.zip
+        sudo mv sonar-scanner-5.0.1.3006-linux /opt/sonar-scanner
         echo "/opt/sonar-scanner/bin" >> $GITHUB_PATH
     - name: Build and push images using Docker Compose
       run: |
