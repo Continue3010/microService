@@ -37,6 +37,10 @@ jobs:
       with:
         distribution: 'temurin'
         java-version: '17'
+    - name: Set JAVA_HOME and update PATH
+      run: |
+        echo "JAVA_HOME=$JAVA_HOME_17_X64" >> $GITHUB_ENV
+        echo "$JAVA_HOME_17_X64/bin" >> $GITHUB_PATH
     - name: Install Maven manually
       run: |
         sudo apt-get update
@@ -60,10 +64,6 @@ jobs:
         unzip sonar-scanner-cli-4.6.2.2472-linux.zip
         sudo mv sonar-scanner-4.6.2.2472-linux /opt/sonar-scanner
         echo "/opt/sonar-scanner/bin" >> $GITHUB_PATH
-    - name: Ensure SonarScanner uses Java 17
-      run: |
-        echo "JAVA_HOME=$JAVA_HOME_17_X64" >> $GITHUB_ENV
-        echo "$JAVA_HOME_17_X64/bin" >> $GITHUB_PATH
     - name: Build and push images using Docker Compose
       run: |
         docker-compose -f docker-compose.yml build
