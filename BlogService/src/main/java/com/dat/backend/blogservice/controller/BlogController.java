@@ -19,9 +19,9 @@ public class BlogController {
     public ResponseEntity<BlogResponse> createBlog(@RequestBody CreateNewBlog createNewBlog) {
         return ResponseEntity.ok(blogService.createBlog(createNewBlog));
     }
-    @GetMapping("/all")
+    @GetMapping("/allBlogs")
     public ResponseEntity<List<BlogResponse>> getAllBlogs() {
         return ResponseEntity.ok(blogService.getAllBlogs());
     }
-
+    
 }
