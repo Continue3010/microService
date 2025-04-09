@@ -61,8 +61,8 @@ jobs:
       run: |
         echo "🔍 Tìm các service có pom.xml..."
         for pom_path in $(find . -name "pom.xml"); do
-          dir=$(dirname "$pom_path")
-          service=$(basename "$dir")
+          dir=$(dirname "$pom_path" )
+          service=$(basename "$dir" | sed 's/[^a-zA-Z0-9_-]//g')
           echo "➡️ Xử lý service: $service"
 
           echo "🏗 Build Maven project..."
