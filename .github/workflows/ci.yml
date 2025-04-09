@@ -88,14 +88,21 @@ jobs:
           echo "📊 SonarCloud scan for $dir"
           export JAVA_HOME=$JAVA_HOME_17_X64
           export PATH=$JAVA_HOME/bin:$PATH
+          BINARIES=$(find "$dir" -type d -path "$dir/target/classes" | paste -sd ":" -)
+
+          # Kiểm tra tồn tại binaries
+          if [ -z "$BINARIES" ]; then
+            echo "❌ Không tìm thấy target/classes trong $dir"
+            exit 1
+          fi
           sonar-scanner \
             -Dsonar.projectKey=Continue3010_microService \
             -Dsonar.organization=continue3010 \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
-            -Dsonar.sources=. \
             -Dsonar.projectBaseDir=. \
-           -Dsonar.java.binaries=$(find . -type d -path "*/target/classes" -print0 | xargs -0 echo | tr ' ' ':') \
+            -Dsonar.sources="src" \
+            -Dsonar.java.binaries="$BINARIES" \
             -Dsonar.projectVersion=1.0.${{ github.run_number }}
         done
 
