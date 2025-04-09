@@ -69,7 +69,7 @@ jobs:
           mvn -f "$dir/pom.xml" clean install -DskipTests
 
           echo "🐳 Build Docker image..."
-          docker buildx build --load -t $DOCKER_ORG/$service:latest "$dir"
+          docker buildx build --load -t $DOCKER_ORG/$service:latest $dir
 
           echo "🚀 Push Docker image..."
           docker push $DOCKER_ORG/$service:latest
