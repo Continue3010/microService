@@ -72,15 +72,15 @@ jobs:
           dir=$(dirname "$pom")
           echo "➡️ Building $dir..."
           mvn -f $dir/pom.xml clean install -DskipTests
-    
+          service_name=$(basename "$dir" | tr '[:upper:]' '[:lower:]')
           echo "🐳 Building Docker image..."
-          docker build -t $DOCKER_ORG/$(basename $dir):latest $dir
+          docker build -t $DOCKER_ORG/$service_name:latest $dir
     
           echo "🚀 Pushing Docker image..."
-          docker push $DOCKER_ORG/$(basename $dir):latest
+          docker push $DOCKER_ORG/$service_name:latest
     
           echo "🔍 Scanning with Snyk..."
-          snyk container monitor $DOCKER_ORG/$(basename $dir):latest --severity-threshold=$SNYK_SEVERITY_THRESHOLD || exit 1
+          snyk container monitor $DOCKER_ORG/$service_name:latest --severity-threshold=$SNYK_SEVERITY_THRESHOLD || exit 1
           echo "📊 SonarCloud scan for $dir"
           sonar-scanner \
             -Dsonar.projectKey=$SONAR_ORG-$(basename $dir) \
