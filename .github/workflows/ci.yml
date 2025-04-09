@@ -68,7 +68,8 @@ jobs:
     - name: Build, test and scan services
       run: |
         # Duyệt qua tất cả thư mục con trong thư mục gốc (hoặc thư mục dịch vụ)
-        for dir in $(find . -type d -name "pom.xml" | sed 's/\/pom.xml//'); do
+         for pom in $(find . -name "pom.xml"); do
+          dir=$(dirname "$pom")
           echo "➡️ Building $dir..."
           mvn -f $dir/pom.xml clean install -DskipTests
     
