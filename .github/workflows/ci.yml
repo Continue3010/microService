@@ -101,7 +101,7 @@ jobs:
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
             -Dsonar.projectBaseDir=. \
-            -Dsonar.sources="src" \
+            -Dsonar.sources=. \
             -Dsonar.java.binaries="$BINARIES" \
             -Dsonar.projectVersion=1.0.${{ github.run_number }}
         done
