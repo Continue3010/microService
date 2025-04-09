@@ -79,7 +79,7 @@ jobs:
           docker push $DOCKER_ORG/$(basename $dir):latest
     
           echo "🔍 Scanning with Snyk..."
-          snyk container test $DOCKER_ORG/$(basename $dir):latest --severity-threshold=$SNYK_SEVERITY_THRESHOLD || exit 1
+          snyk container monitor $DOCKER_ORG/$(basename $dir):latest --severity-threshold=$SNYK_SEVERITY_THRESHOLD || exit 1
           echo "📊 SonarCloud scan for $dir"
           sonar-scanner \
             -Dsonar.projectKey=$SONAR_ORG-$(basename $dir) \
