@@ -80,12 +80,12 @@ jobs:
           snyk container monitor $DOCKER_ORG/$service:latest --severity-threshold=$SNYK_SEVERITY_THRESHOLD || exit 1
 
           echo "📊 SonarCloud scan..."
-          sonar-scanner \
-            -Dsonar.projectKey=$SONAR_ORG-$(basename $dir) \
-            -Dsonar.organization=$SONAR_ORG \
-            -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
-            -Dsonar.projectBaseDir=$dir \
-            -Dsonar.java.binaries=$dir/target/classes \
-            -Dsonar.projectVersion=1.0.${{ github.run_number }}
+          sonar-scanner -X \
+          -Dsonar.projectKey=$SONAR_ORG-$service \
+          -Dsonar.organization=$SONAR_ORG \
+          -Dsonar.host.url=https://sonarcloud.io \
+          -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
+          -Dsonar.projectBaseDir="$dir" \
+          -Dsonar.java.binaries="$dir/target/classes" \
+          -Dsonar.projectVersion=1.0.${{ github.run_number }}
         done
