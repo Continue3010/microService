@@ -7,9 +7,10 @@ on:
     branches: [ "main" ]
 
 env:
-    SNYK_SEVERITY_THRESHOLD: high
-    DOCKER_ORG: ${{ secrets.DOCKERHUB_USERNAME }}  
-    SONAR_ORG: ${{ secrets.SONARQUBE_ORG }}   
+  SNYK_SEVERITY_THRESHOLD: high
+  DOCKER_ORG: ${{ secrets.DOCKERHUB_USERNAME }}
+  SONAR_ORG: ${{ secrets.SONARQUBE_ORG }}
+
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
@@ -32,62 +33,59 @@ jobs:
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
+
     - name: Set up JDK 17
       uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
         java-version: '17'
+
     - name: Install Maven manually
       run: |
         sudo apt-get update
         sudo apt-get install -y maven
         mvn --version
+
     - name: Install Snyk
-      run: |
-        npm install -g snyk
+      run: npm install -g snyk
 
     - name: Authenticate Snyk
-      run: |
-        snyk auth ${{ secrets.SNYK_TOKEN }}
+      run: snyk auth ${{ secrets.SNYK_TOKEN }}
 
-    - name: Build and push images using Docker Compose
-      run: |
-        docker-compose -f docker-compose.yml build
-        docker-compose -f docker-compose.yml push || exit 1
     - name: Install Sonar Scanner
       run: |
         wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip
         unzip sonar-scanner-cli-4.6.2.2472-linux.zip
         sudo mv sonar-scanner-4.6.2.2472-linux /opt/sonar-scanner
         echo "/opt/sonar-scanner/bin" >> $GITHUB_PATH
-    - name: Build and push images using Docker Compose
-      run: |
-        docker-compose -f docker-compose.yml build
-        docker-compose -f docker-compose.yml push
 
-    - name: Build, test and scan services
+    - name: Build, push, scan and analyze services
       run: |
-        # Duyệt qua tất cả thư mục con trong thư mục gốc (hoặc thư mục dịch vụ)
-        for dir in $(find . -type d -name "pom.xml" | sed 's/\/pom.xml//'); do
-          echo "➡️ Building $dir..."
-          mvn -f $dir/pom.xml clean install -DskipTests
-    
-          echo "🐳 Building Docker image..."
-          docker build -t $DOCKER_ORG/$(basename $dir):latest $dir
-    
-          echo "🚀 Pushing Docker image..."
-          docker push $DOCKER_ORG/$(basename $dir):latest
-    
-          echo "🔍 Scanning with Snyk..."
-          snyk container monitor $DOCKER_ORG/$(basename $dir):latest --severity-threshold=$SNYK_SEVERITY_THRESHOLD || exit 1
-          echo "📊 SonarCloud scan for $dir"
+        echo "🔍 Tìm các service có pom.xml..."
+        for pom_path in $(find . -name "pom.xml"); do
+          dir=$(dirname "$pom_path")
+          service=$(basename "$dir")
+          echo "➡️ Xử lý service: $service"
+
+          echo "🏗 Build Maven project..."
+          mvn -f "$dir/pom.xml" clean install -DskipTests
+
+          echo "🐳 Build Docker image..."
+          docker build -t $DOCKER_ORG/$service:latest "$dir"
+
+          echo "🚀 Push Docker image..."
+          docker push $DOCKER_ORG/$service:latest
+
+          echo "🔒 Monitor image với Snyk..."
+          snyk container monitor $DOCKER_ORG/$service:latest --severity-threshold=$SNYK_SEVERITY_THRESHOLD || exit 1
+
+          echo "📊 SonarCloud scan..."
           sonar-scanner \
-            -Dsonar.projectKey=$SONAR_ORG-$(basename $dir) \
+            -Dsonar.projectKey=$SONAR_ORG-$service \
             -Dsonar.organization=$SONAR_ORG \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
-            -Dsonar.projectBaseDir=$dir \
-            -Dsonar.java.binaries=$dir/target/classes \
+            -Dsonar.projectBaseDir="$dir" \
+            -Dsonar.java.binaries="$dir/target/classes" \
             -Dsonar.projectVersion=1.0.${{ github.run_number }}
         done
-
