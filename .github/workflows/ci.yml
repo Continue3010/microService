@@ -95,7 +95,7 @@ jobs:
             -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
             -Dsonar.sources=. \
             -Dsonar.projectBaseDir=. \
-            -Dsonar.java.binaries=$(find . -type d -path "*/target/classes" | paste -sd ":" -) \
+           -Dsonar.java.binaries=$(find . -type d -path "*/target/classes" -print0 | xargs -0 echo | tr ' ' ':') \
             -Dsonar.projectVersion=1.0.${{ github.run_number }}
         done
 
