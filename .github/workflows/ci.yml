@@ -47,8 +47,10 @@ jobs:
         sudo mv sonar-scanner-5.0.1.3006-linux /opt/sonar-scanner
         echo "/opt/sonar-scanner/bin" >> $GITHUB_PATH
         sudo apt-get install -y wget
-        wget https://github.com/aquasecurity/trivy/releases/latest/download/trivy_0.50.1_Linux-64bit.deb
-        sudo dpkg -i trivy_0.50.1_Linux-64bit.deb
+        wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
+        echo "deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
+        sudo apt-get update
+        sudo apt-get install -y trivy
 
     - name: Authenticate Snyk
       run: snyk auth ${{ secrets.SNYK_TOKEN }}
