@@ -23,8 +23,5 @@ public class BlogController {
     public ResponseEntity<List<BlogResponse>> getAllBlogs() {
         return ResponseEntity.ok(blogService.getAllBlogs());
     }
-     @GetMapping("/all-Blogs")
-    public ResponseEntity<List<BlogResponse>> getAllBlogs() {
-        return ResponseEntity.ok(blogService.getAllBlogs());
-    }
+   
 }
