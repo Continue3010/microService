@@ -73,7 +73,7 @@ jobs:
           echo "➡️ Processing $service_name in $dir..."
           
           # Build and unit test
-          #mvn -f "$pom" clean install
+          mvn -f "$pom" clean install
           
           # Code analysis
           BINARIES=$(find "$dir" -type d -path "$dir/target/classes" | paste -sd ":" -)
