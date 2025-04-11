@@ -72,7 +72,12 @@ jobs:
           
           echo "➡️ Processing $service_name in $dir..."
           
-          (cd "$dir" && mvn clean install -DskipTests=true)
+         (cd "$dir" && mvn clean install -DskipTests=true) || {
+
+             echo "$dir"
+            echo "❌ Maven build failed for $service_name"
+            exit 1
+        }
 
           
           # Code analysis
