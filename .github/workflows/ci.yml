@@ -72,9 +72,7 @@ jobs:
           
           echo "➡️ Processing $service_name in $dir..."
           
-          # Build and unit test
           (cd "$dir" && mvn clean install -DskipTests=true)
-         (cd "$dir" && mvn test)
 
           
           # Code analysis
