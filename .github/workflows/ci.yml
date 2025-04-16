@@ -90,6 +90,7 @@ jobs:
           BINARIES=$(find "$dir" -type d -path "$dir/target/classes" | paste -sd ":" -)
           echo "DEBUG: BINARIES found = '$BINARIES'"
           if [ -n "$BINARIES" ]; then
+            BINARIES="target/classes"
             sonar-scanner \
               -Dsonar.projectKey=Continue3010_microService \
               -Dsonar.organization=continue3010 \
