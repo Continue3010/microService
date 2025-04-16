@@ -88,6 +88,7 @@ jobs:
           
           # Code analysis
           BINARIES=$(find "$dir" -type d -path "$dir/target/classes" | paste -sd ":" -)
+          echo "DEBUG: BINARIES found = '$BINARIES'"
           if [ -n "$BINARIES" ]; then
             sonar-scanner \
               -Dsonar.projectKey=Continue3010_microService \
