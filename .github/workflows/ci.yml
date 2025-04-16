@@ -80,7 +80,7 @@ jobs:
 
           
           # Code analysis
-          BINARIES=$(find "$dir" -type d -path "$dir/target/classes" | paste -sd ":" -)
+          BINARIES=$(find "$dir/target" -type f -name "*.class" -exec dirname {} \; | sort -u | paste -sd ":" -)
           if [ -n "$BINARIES" ]; then
             sonar-scanner \
               -Dsonar.projectKey=Continue3010_microService \
