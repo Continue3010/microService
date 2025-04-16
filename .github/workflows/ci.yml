@@ -77,10 +77,17 @@ jobs:
             echo "❌ Maven build failed for $service_name"
             exit 1
         }
-
+        # ✅ Kiểm tra sau khi build: có file .class không?
+        CLASS_COUNT=$(find "$dir/target/classes" -type f -name "*.class" | wc -l)
+        if [ "$CLASS_COUNT" -eq 0 ]; then
+            echo "⚠️ No .class files found in $dir/target/classes – something went wrong during build"
+            exit 1
+        else
+            echo "✅ Build successful for $service_name – $CLASS_COUNT class files found"
+        fi
           
           # Code analysis
-          BINARIES=$(find "$dir/target" -type f -name "*.class" -exec dirname {} \; | sort -u | paste -sd ":" -)
+          BINARIES=$(find "$dir" -type d -path "$dir/target/classes" | paste -sd ":" -)
           if [ -n "$BINARIES" ]; then
             sonar-scanner \
               -Dsonar.projectKey=Continue3010_microService \
